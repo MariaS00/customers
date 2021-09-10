@@ -24,7 +24,6 @@ class AddressTest {
 
         //when  // save to db
         em.persist(address);   // add to cache
-        
         // just for test in result select
         em.flush();     //insert into addresses .......
         em.clear();     // clear cache

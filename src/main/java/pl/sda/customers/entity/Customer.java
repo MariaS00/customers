@@ -2,31 +2,44 @@ package pl.sda.customers.entity;
 
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
 @Table(name = "customers")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "customer_type")
 @Getter
-@EqualsAndHashCode
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class Customer {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public abstract class Customer {
 
     @Id
     private UUID id;
     private String email;
-    private String firstName;
-    private String lastName;
-    private String pesel;
 
-    public Customer(@NonNull String email, @NonNull String firstName, @NonNull String lastName, @NonNull String pesel) {
+    @OneToMany
+    @JoinColumn(name = "customer_id")
+    private List<Address> addresses;
+
+    protected Customer(@NonNull String email) {
         this.id = UUID.randomUUID();
         this.email = email;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.pesel = pesel;
+        this.addresses = new ArrayList<>();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Customer customer = (Customer) o;
+        return id.equals(customer.id) && email.equals(customer.email);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, email);
+    }
 }
