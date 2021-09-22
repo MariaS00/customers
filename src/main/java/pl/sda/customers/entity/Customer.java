@@ -30,6 +30,12 @@ public abstract class Customer {
         this.addresses = new ArrayList<>();
     }
 
+    public void addAddresses(Address address) {
+        if (address != null && !addresses.contains(address)){
+            addresses.add(address);
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
