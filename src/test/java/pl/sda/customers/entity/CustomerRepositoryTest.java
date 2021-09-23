@@ -105,7 +105,7 @@ class CustomerRepositoryTest {
         repository.saveAllAndFlush(List.of(customer1, customer2, customer3));
 
         // when
-        final List<Customer> result = repository.findCustomersInCity("Krakow");
+        final var result = repository.findCustomersInCity("Krakow");
 
         // then
         assertEquals(List.of(customer2, customer3), result);
@@ -133,32 +133,52 @@ class CustomerRepositoryTest {
 
         // then - sprawdź czy wyniki się zgadzają z założeniami
         assertEquals(List.of(customer1, customer3, customer5), result);
-//        fail(); // usuń tą linię jak skończysz test
     }
 
     @Test
     void shouldFindAllAddressesForLastName() {
         // given - utwórz kilka osób wraz z adresami
+        final var customer1 = new Person("jan2@wp.pl","Jan","Nowak","852145863");
+        final var customer3 = new Person("olgi22@interia.pl","Olgiert","Kowalski","55598845");
+        final var customer4 = new Person("olgi22@interia.pl","Olgiert","Kowalski","55598845");
+
+        customer1.addAddresses(new Address("str","Warszawa","04-333","PL"));
+        customer3.addAddresses(new Address("str","Wroclaw","08-256","PL"));
+        customer4.addAddresses(new Address("str","Krakow","05866","PL"));
+
+        repository.saveAllAndFlush(List.of(customer1, customer3, customer4));
 
         // when - dodaj metodę w repository, która zwróci wszsytkie adresy pod którymi mieszkają osoby o nazwisku: "Kowalski"
         // np.
-        // final var result = repository.findAllAddressesForLastName("Kowalski");
+        final var result = repository.findAllAddressesForLastName("Kowalski");
 
         // then - sprawdź czy wyniki się zgadzają z założeniami
-        fail(); // usuń tą linię jak skończysz test
+        assertEquals(List.of(customer3, customer4), result);
     }
 
     @Test
     void shouldCountCustomersByCity() {
         // given - utwórz różnych klientów wraz z adresami
+        final var customer1 = new Person("jan2@wp.pl","Jan","Nowak","852145863");
+        final var customer2 = new Company("com2@wp.pl","Comp S.A","2694225");
+        final var customer3 = new Person("olgi22@interia.pl","Olgiert","Mickiewicz","55598845");
+        final var customer4 = new Company("com2@wp.pl","Comp S.A","2694225");
+
+        customer1.addAddresses(new Address("str","Warszawa","04-333","PL"));
+        customer2.addAddresses(new Address("str","Krakow","08-256","PL"));
+        customer3.addAddresses(new Address("str","Krakow","08-256","PL"));
+        customer4.addAddresses(new Address("str","Wroclaw","08-256","PL"));
+
+        repository.saveAllAndFlush(List.of(customer1, customer2, customer3, customer4));
 
         // when - napisz query, które zwróci miast + liczbę klientów w danym mieście np.
         // city     |  number_of_customers
         // Warszawa |  2
         // Kraków   |  3
-        // final var result = repository.countCustomersByCity();
+         final var result = repository.countCustomersByCity();
+         List<Integer> expected = List.of(1,2,1);
 
         // then - sprawdź czy wyniki się zgadzają z założeniami
-        fail(); // usuń tą linię jak skończysz test
+        assertEquals(expected,result);
     }
 }

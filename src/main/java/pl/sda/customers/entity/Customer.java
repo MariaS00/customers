@@ -20,7 +20,7 @@ public abstract class Customer {
     private UUID id;
     private String email;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)   // jesli bedzie potrzeba zapisania to zapisze
     @JoinColumn(name = "customer_id")
     private List<Address> addresses;
 
