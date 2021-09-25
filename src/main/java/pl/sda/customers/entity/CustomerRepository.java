@@ -20,15 +20,30 @@ public interface CustomerRepository extends JpaRepository<Customer, UUID> {
     @Query("FROM Customer c JOIN c.addresses a WHERE UPPER(a.city)= UPPER(?1)")
     List<Customer> findCustomersInCity(String city);
 
-    @Query("SELECT c FROM Company c JOIN c.addresses a WHERE UPPER(a.countryCode) = UPPER(?1) ORDER BY c.name")
+    @Query("SELECT c FROM Company c JOIN c.addresses a WHERE UPPER(a.countryCode) = UPPER(?1) ORDER BY c.name asc")
     List<Company> findCompaniesInCountry(String country);
 
-    @Query("FROM Person p JOIN p.addresses a WHERE UPPER(p.lastName)= UPPER(?1) GROUP BY a")
-    List<Person> findAllAddressesForLastName(String lastName);
+    @Query("SELECT p.addresses FROM Person p WHERE UPPER(p.lastName) = UPPER(?1)")
+    List<Address> findAllAddressesForLastName(String lastName);
 
-    @Query("SELECT c, COUNT (a.city) FROM Customer c JOIN c.addresses a GROUP BY a.city")
-    List<Customer> countCustomersByCity();
+    @Query("SELECT a.city, COUNT (c) FROM Customer c INNER JOIN c.addresses a GROUP BY a.city ORDER BY a.city ASC ")
+    List<Object[]> countCustomersByCity();
 
-//    @Query("SELECT COUNT (*) FROM( SELECT COUNT(*) FROM Customer c JOIN c.addresses a GROUP BY a.city)")
-//    List<Customer> countCustomersByCity();
+    @Query("SELECT a.countryCode AS countryCode, COUNT (c) AS count FROM Customer c " +
+            "INNER JOIN c.addresses a " +
+            "GROUP BY a.countryCode " +
+            "ORDER BY a.countryCode ASC ")
+    List<CountCustomerByCountryCode> countCustomersByCountyCode();
+
+    interface CountCustomerByCountryCode {
+        String getCountryCode();
+        int getCount();
+    }
+
+    @Query("SELECT new pl.sda.customers.entity.CompanyZipCodeView(c.name, c.vat, a.zipCode) " +
+            "FROM Company c INNER JOIN c.addresses a WHERE a.zipCode LIKE ?1")
+    List<CompanyZipCodeView> findCompaniesWithZipCode(String zipCode);
+
+    @Query("FROM PersonView v WHERE UPPER(v.email) LIKE UPPER(?1)")
+    List<PersonView> findPersonViewByEmail(String email);
 }
