@@ -1,6 +1,7 @@
 package pl.sda.customers.entity;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
@@ -37,6 +38,7 @@ public interface CustomerRepository extends JpaRepository<Customer, UUID> {
 
     interface CountCustomerByCountryCode {
         String getCountryCode();
+
         int getCount();
     }
 
@@ -46,4 +48,29 @@ public interface CustomerRepository extends JpaRepository<Customer, UUID> {
 
     @Query("FROM PersonView v WHERE UPPER(v.email) LIKE UPPER(?1)")
     List<PersonView> findPersonViewByEmail(String email);
+
+    @Modifying  // domyslnie query jest select wiec inne musimy to dodac, zeby update faktycznie bylo update
+    @Query("UPDATE Address  SET countryCode = :countryCode WHERE  city = :city")
+    int updateCountryCodeForCity(String city, String countryCode);
+
+    @Query("SELECT count(a) FROM Address a WHERE a.city = :city AND a.countryCode = :countryCode")
+    int countCityWithCountryCode(String city, String countryCode);
+
+    @Modifying
+    @Query("DELETE FROM Address a WHERE a.zipCode = :zipCode")
+    int deleteAllAddressesWithZipCode(String zipCode);
+
+    @Query("SELECT count(a) FROM Address a WHERE a.zipCode = :zipCode")
+    int countAddressesWithZipCode(String zipCode);
+
+    @Query("SELECT (COUNT(c) > 0) FROM Customer c WHERE UPPER(c.email) = UPPER(?1)")
+    boolean emailExists(String email);
+
+    @Query("SELECT (COUNT(c) > 0) FROM Company c WHERE c.vat = ?1")
+    boolean vatExists(String vat);
+
+    @Query("SELECT (COUNT(p) > 0) FROM Person p WHERE p.pesel = ?1")
+    boolean peselExists(String pesel);
+
+
 }

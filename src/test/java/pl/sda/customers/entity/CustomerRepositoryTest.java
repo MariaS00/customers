@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 
 import java.util.List;
@@ -16,6 +17,9 @@ class CustomerRepositoryTest {
 
     @Autowired
     private CustomerRepository repository;
+
+    @Autowired
+    private EntityManager em;
 
     @Test
     void shouldSave() {
@@ -246,7 +250,7 @@ class CustomerRepositoryTest {
     }
 
     @Test
-    void shouldFindPersonViewByEmail(){
+    void shouldFindPersonViewByEmail() {
         //given
         final var customer1 = new Person("jan2@wp.pl", "Jan", "Nowak", "852145863");
         final var customer2 = new Person("jan2@wp.com", "Jan", "Nowak", "852145863");
@@ -261,9 +265,53 @@ class CustomerRepositoryTest {
 
         //then
         assertTrue(List.of(new PersonView(customer2.getId(), customer2.getEmail(), customer2.getPesel()),
-                new PersonView(customer4.getId(), customer4.getEmail(), customer4.getPesel()))
+                        new PersonView(customer4.getId(), customer4.getEmail(), customer4.getPesel()))
                 .containsAll(result));
+    }
 
+    @Test
+    void shouldUpdateCountryCodeForCity() {
+        // given
+        final var company1 = new Company("com@wp.pl", "Januszex", "1234567");
+        final var company2 = new Company("squat@wp.pl", "Poltex", "2389232");
+        final var company3 = new Company("port@wp.pl", "TylkoPolska", "3459898");
+        final var company4 = new Company("gryka@wp.pl", "GrykPol", "9871293471");
 
+        company1.addAddresses(new Address("str", "Dzierżoniów", "23-999", "PL"));
+        company2.addAddresses(new Address("str", "Zgorzelec", "32-654", "PL"));
+        company3.addAddresses(new Address("str", "Dzierżoniów", "23-098", "DE"));
+        company4.addAddresses(new Address("str", "Dzierżoniów", "23-234", "DE"));
+
+        repository.saveAllAndFlush(List.of(company1, company2, company3, company4));
+
+        // when
+        final int result = repository.updateCountryCodeForCity("Dzierżoniów", "PL");
+
+        // then
+        assertEquals(3, result);
+        assertEquals(0, repository.countCityWithCountryCode("Dzierżoniów", "DE"));
+    }
+
+    @Test
+    void shouldDeleteAllAddressesWithZipCode() {
+        // given - przygotowanie danych testowych
+        final var company1 = new Company("com@wp.pl", "Januszex", "1234567");
+        final var company2 = new Company("squat@wp.pl", "Poltex", "2389232");
+        final var company3 = new Company("port@wp.pl", "TylkoPolska", "3459898");
+        final var company4 = new Company("gryka@wp.pl", "GrykPol", "9871293471");
+
+        company1.addAddresses(new Address("str", "Dzierżoniów", "23-999", "PL"));
+        company2.addAddresses(new Address("str", "Zgorzelec", "32-654", "PL"));
+        company3.addAddresses(new Address("str", "Dzierżoniów", "23-999", "DE"));
+        company4.addAddresses(new Address("str", "Dzierżoniów", "23-234", "DE"));
+
+        repository.saveAllAndFlush(List.of(company1, company2, company3, company4));
+
+        // when - usuwanie adresów o danym zipCode
+        final int result = repository.deleteAllAddressesWithZipCode("23-999");
+
+        // weryfikacja wyników
+        assertEquals(2, result);
+        assertEquals(0, repository.countAddressesWithZipCode("23-999"));
     }
 }
