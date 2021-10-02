@@ -18,10 +18,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class CustomerServiceTest {
+class CustomerRegistrationServiceTest {
 
     @Autowired
-    private CustomerService service;
+    private CustomerRegistrationService service;
 
     @Autowired
     private CustomerRepository repository;

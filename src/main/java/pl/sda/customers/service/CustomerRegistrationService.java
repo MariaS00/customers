@@ -18,7 +18,7 @@ import javax.transaction.Transactional;
 @Service        // jak @Component
 @Transactional
 @RequiredArgsConstructor
-public class CustomerService {
+public class CustomerRegistrationService {
 
     @NonNull
     private final CustomerRepository repository;
@@ -35,7 +35,7 @@ public class CustomerService {
         if (repository.vatExists(form.getVat())) {
             throw new VatAlreadyExistsException("vat exists: " + form.getVat());
         }
-        final var company = new Company(form.getEmail(), form.getName(), form.getVat());
+        final var company = Company.createWith(form);
         repository.save(company);
         return new RegisteredCustomerId(company.getId());
     }
@@ -47,7 +47,7 @@ public class CustomerService {
         if (repository.peselExists(form.getPesel())) {
             throw new PeselAlreadyExistsException("pesel exists: " + form.getPesel());
         }
-        final var person = new Person(form.getEmail(), form.getFirstName(), form.getLastName(), form.getPesel());
+        final var person = Person.createWith(form);
         repository.save(person);
         return new RegisteredCustomerId(person.getId());
     }
