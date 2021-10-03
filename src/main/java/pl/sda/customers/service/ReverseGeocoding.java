@@ -2,15 +2,20 @@ package pl.sda.customers.service;
 
 import com.google.maps.errors.ApiException;
 import pl.sda.customers.entity.Address;
+import pl.sda.customers.service.exception.BusinessServiceException;
 
 import java.io.IOException;
 
 interface ReverseGeocoding {
 
-    class ReverseGeoCodingException extends RuntimeException {
+    class ReverseGeocodingException extends RuntimeException {
 
-        public ReverseGeoCodingException(String message, Throwable cause) {
+        public ReverseGeocodingException(String message, Throwable cause) {
             super(message, cause);
+        }
+
+        public ReverseGeocodingException(String message) {
+            super(message);
         }
     }
 
