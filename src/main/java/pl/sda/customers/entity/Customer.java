@@ -1,6 +1,8 @@
 package pl.sda.customers.entity;
 
 import lombok.*;
+import pl.sda.customers.service.dto.CustomerDetails;
+import pl.sda.customers.service.dto.CustomerView;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -42,6 +44,14 @@ public abstract class Customer {
 
     public abstract String getName();
 
+    public abstract CustomerDetails mapToDetails();
+
+    public CustomerView toView() {
+        return new CustomerView(getId(),
+                getName(),
+                getEmail(),
+                getCustomerType());
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -55,4 +65,5 @@ public abstract class Customer {
     public int hashCode() {
         return Objects.hash(id, email);
     }
+
 }

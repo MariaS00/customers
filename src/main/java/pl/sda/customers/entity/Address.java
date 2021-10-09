@@ -4,6 +4,7 @@ import com.sun.istack.NotNull;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
+import pl.sda.customers.service.dto.AddressView;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -36,5 +37,9 @@ public final class Address {
 
     // only for hibernate
     private Address() {
+    }
+
+    public AddressView toView() {
+    return new AddressView(id, street, city, zipCode,countryCode);
     }
 }
